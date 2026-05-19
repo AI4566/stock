@@ -1,0 +1,25 @@
+# rqalpha 回测配置
+version: "0.6"
+
+extra:
+  locale: zh_CN
+
+base:
+  start_date: 20240101
+  end_date: 20250501
+  frequency: 1d
+  accounts:
+    stock: 100000  # 初始资金 10万
+
+mod:
+  sys_analyser:
+    enabled: true
+    benchmark: "000300.XSHG"  # 沪深300为基准
+    plot: true
+    output_file: "result.pkl"
+    report_save_path: "logs/"
+
+  sys_simulation:
+    enabled: true
+    matching_type: next_bar_open
+    volume_limit: 0.025

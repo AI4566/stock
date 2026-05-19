@@ -37,6 +37,12 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Vendor (git clone separately)
+vendor/
+
+# pip artifacts
+=*
+
 # Secrets
 .env
 *.key
