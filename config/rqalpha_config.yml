@@ -7,19 +7,15 @@ extra:
 base:
   start_date: 20240101
   end_date: 20250501
-  frequency: 1d
+  frequency: "1d"
   accounts:
-    stock: 100000  # 初始资金 10万
+    stock: 100000
 
 mod:
   sys_analyser:
     enabled: true
-    benchmark: "000300.XSHG"  # 沪深300为基准
-    plot: true
-    output_file: "result.pkl"
+    benchmark: "000300.XSHG"
     report_save_path: "logs/"
 
   sys_simulation:
     enabled: true
-    matching_type: next_bar_open
-    volume_limit: 0.025
