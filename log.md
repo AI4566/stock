@@ -84,3 +84,35 @@
 - [ ] 添加数据存储模块（本地缓存）
 - [ ] 优化策略参数（可配置化）
 - [ ] 添加实时监控模块
+
+---
+
+## 2026-05-19 (续) C盘清理 + 数据迁移
+
+### 目标
+C盘空间不足，将项目相关数据迁移到D盘。
+
+### 操作
+1. **rqalpha 数据包迁移**（3.3GB）
+   - 从 `C:\Users\Jptr\.rqalpha\bundle\` 复制到 `D:\desktop\stock\data\rqalpha_bundle\`
+   - 用 Junction 链接回原路径，代码无需修改
+2. **清理 C 盘缓存**
+   - pip cache 423MB → 清空
+   - .cache (huggingface/codex) 778MB → 清空
+3. **C 盘总计释放 ~4.5GB**
+
+### 验证
+- rqalpha check-bundle ✅
+- 回测运行正常 ✅
+
+### D盘项目结构（3.3GB）
+```
+D:\desktop\stock\
+├── data/
+│   ├── fetcher.py              # 数据获取接口
+│   └── rqalpha_bundle/         # rqalpha 回测数据包（3.3GB）
+├── strategies/                 # 5个策略
+├── config/                     # 回测配置
+├── run_backtest.py             # 批量回测工具
+└── log.md                      # 开发日志
+```
