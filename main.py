@@ -12,8 +12,8 @@ def cmd_fetch():
     """获取数据演示"""
     from data.fetcher import get_stock_data
 
-    print(">>> 获取贵州茅台日线数据 (akshare)")
-    df = get_stock_data('600519', source='akshare')
+    print(">>> 获取贵州茅台日线数据 (auto)")
+    df = get_stock_data('600519', source='auto')
     print(df.tail(10))
     print(f"\n共 {len(df)} 条记录")
 

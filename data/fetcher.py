@@ -17,36 +17,46 @@ def fetch_ashare(code, end_date='', count=100, frequency='1d'):
     return ashare_get_price(code, end_date=end_date, count=count, frequency=frequency)
 
 
-def fetch_akshare_daily(symbol, start_date=None, end_date=None, adjust="qfq"):
+def fetch_akshare_daily(symbol, start_date=None, end_date=None, adjust="qfq", retries=3):
     """
     通过 akshare 获取日线数据
     symbol: 股票代码，如 '600519'
     adjust: qfq=前复权, hfq=后复权, 空=不复权
+    retries: 网络重试次数
     """
+    import time
     import akshare as ak
     if end_date is None:
         end_date = datetime.datetime.now().strftime('%Y%m%d')
     if start_date is None:
         start_date = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime('%Y%m%d')
 
-    df = ak.stock_zh_a_hist(
-        symbol=symbol,
-        period="daily",
-        start_date=start_date,
-        end_date=end_date,
-        adjust=adjust
-    )
-    df = df.rename(columns={
-        '日期': 'date', '开盘': 'open', '收盘': 'close',
-        '最高': 'high', '最低': 'low', '成交量': 'volume',
-        '成交额': 'amount', '振幅': 'amplitude',
-        '涨跌幅': 'pct_change', '涨跌额': 'change',
-        '换手率': 'turnover'
-    })
-    df['date'] = pd.to_datetime(df['date'])
-    df.set_index('date', inplace=True)
-    df.index.name = ''
-    return df
+    last_err = None
+    for i in range(retries):
+        try:
+            df = ak.stock_zh_a_hist(
+                symbol=symbol,
+                period="daily",
+                start_date=start_date,
+                end_date=end_date,
+                adjust=adjust
+            )
+            df = df.rename(columns={
+                '日期': 'date', '开盘': 'open', '收盘': 'close',
+                '最高': 'high', '最低': 'low', '成交量': 'volume',
+                '成交额': 'amount', '振幅': 'amplitude',
+                '涨跌幅': 'pct_change', '涨跌额': 'change',
+                '换手率': 'turnover'
+            })
+            df['date'] = pd.to_datetime(df['date'])
+            df.set_index('date', inplace=True)
+            df.index.name = ''
+            return df
+        except Exception as e:
+            last_err = e
+            if i < retries - 1:
+                time.sleep(2)
+    raise last_err
 
 
 def fetch_akshare_realtime():
@@ -59,14 +69,19 @@ def get_stock_data(code, source='ashare', **kwargs):
     """
     统一数据获取入口
     code: 股票代码
-    source: 'ashare' 或 'akshare'
+    source: 'ashare'、'akshare' 或 'auto'（自动降级）
     """
     if source == 'ashare':
         return fetch_ashare(code, **kwargs)
     elif source == 'akshare':
         return fetch_akshare_daily(code, **kwargs)
+    elif source == 'auto':
+        try:
+            return fetch_akshare_daily(code, **kwargs)
+        except Exception:
+            return fetch_ashare(code, **kwargs)
     else:
-        raise ValueError(f"未知数据源: {source}，可选 'ashare' 或 'akshare'")
+        raise ValueError(f"未知数据源: {source}，可选 'ashare'、'akshare' 或 'auto'")
 
 
 if __name__ == '__main__':

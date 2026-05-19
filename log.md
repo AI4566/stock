@@ -33,3 +33,17 @@
 - [ ] 测试 rqalpha 回测运行
 - [ ] 添加更多策略模板
 - [ ] 添加数据存储模块
+
+---
+
+## 2026-05-18 (续) 数据源优化
+
+### 改进
+1. **fetcher.py 增加网络重试**：akshare 请求失败时自动重试3次，间隔2秒
+2. **新增 `auto` 模式**：`get_stock_data(code, source='auto')` 先尝试 akshare，失败自动降级到 Ashare
+3. **main.py 使用 auto 模式**：默认走自动降级策略
+
+### 验证结果
+- akshare：贵州茅台 242 条日线 ✅（偶有网络抖动，重试后成功）
+- Ashare：上证指数 10 日行情 ✅
+- `python main.py fetch` 运行正常 ✅
