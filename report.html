@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股量化投资回测报告 | 2025.04 ~ 2026.05</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'Microsoft YaHei', sans-serif; background: #0a0a1a; color: #e0e0e0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; color: #00d4ff; font-size: 28px; margin: 20px 0; }
+h2 { color: #00d4ff; border-bottom: 2px solid #1a3a5c; padding-bottom: 10px; margin: 30px 0 15px; }
+h3 { color: #b0b0b0; margin-bottom: 10px; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+.stat-card { background: #111128; border: 1px solid #1a3a5c; border-radius: 10px; padding: 20px; text-align: center; }
+.stat-card .value { font-size: 28px; font-weight: bold; }
+.stat-card .label { color: #888; font-size: 14px; margin-top: 5px; }
+.positive { color: #27ae60; }
+.negative { color: #e74c3c; }
+.chart-container { background: #111128; border: 1px solid #1a3a5c; border-radius: 10px; padding: 20px; margin: 20px 0; }
+.month-card { background: #111128; border: 1px solid #1a3a5c; border-radius: 10px; padding: 15px; margin: 15px 0; }
+.stock-table { width: 100%; border-collapse: collapse; }
+.stock-table th { background: #1a2a4a; padding: 10px; text-align: left; color: #00d4ff; }
+.stock-table td { padding: 8px 10px; border-bottom: 1px solid #1a2a3a; }
+.stock-table tr:hover { background: #1a2a3a; }
+.tab { display: flex; gap: 10px; margin: 20px 0; }
+.tab button { padding: 10px 20px; background: #1a2a4a; color: #00d4ff; border: 1px solid #1a3a5c; border-radius: 5px; cursor: pointer; }
+.tab button.active { background: #00d4ff; color: #0a0a1a; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.footer { text-align: center; color: #555; margin-top: 40px; padding: 20px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>A股量化投资回测报告</h1>
+    <p style="text-align:center;color:#888">回测区间: 2025年4月 ~ 2026年5月 | 初始资金: 100,000元 | 5策略加权选股</p>
+
+    <div class="summary">
+        <div class="stat-card">
+            <div class="value negative">-10.46%</div>
+            <div class="label">总收益率</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">89,538</div>
+            <div class="label">最终市值(元)</div>
+        </div>
+        <div class="stat-card">
+            <div class="value positive">6</div>
+            <div class="label">盈利月份</div>
+        </div>
+        <div class="stat-card">
+            <div class="value negative">8</div>
+            <div class="label">亏损月份</div>
+        </div>
+        <div class="stat-card">
+            <div class="value positive">+9.08%</div>
+            <div class="label">最佳月份 (2025-06)</div>
+        </div>
+        <div class="stat-card">
+            <div class="value negative">-7.90%</div>
+            <div class="label">最差月份 (2025-12)</div>
+        </div>
+    </div>
+
+    <h2>组合市值走势</h2>
+    <div class="chart-container">
+        <canvas id="portfolioChart" height="100"></canvas>
+    </div>
+
+    <h2>月度收益分布</h2>
+    <div class="chart-container">
+        <canvas id="returnsChart" height="80"></canvas>
+    </div>
+
+    <div class="tab">
+        <button class="active" onclick="showTab('picks')">我的每月选股</button>
+        <button onclick="showTab('compare')">vs 实际TOP10</button>
+    </div>
+
+    <div id="picks" class="tab-content active">
+        <h2>我的每月选股及盈亏</h2>
+        
+        <div class="month-card">
+            <h3>2025-04 <span style="color:#e74c3c">月收益: -5.25%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 94,752 | 累计: -5.25%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>603050.XSHG</td>
+                <td>0.30938</td>
+                <td>15.14</td>
+                <td>14.51</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.16%</td>
+            </tr>
+            <tr>
+                <td>600058.XSHG</td>
+                <td>0.306477</td>
+                <td>7.22</td>
+                <td>7.17</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.69%</td>
+            </tr>
+            <tr>
+                <td>600307.XSHG</td>
+                <td>0.301176</td>
+                <td>1.42</td>
+                <td>1.37</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.52%</td>
+            </tr>
+            <tr>
+                <td>600372.XSHG</td>
+                <td>0.298992</td>
+                <td>11.1</td>
+                <td>10.82</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.52%</td>
+            </tr>
+            <tr>
+                <td>600022.XSHG</td>
+                <td>0.296554</td>
+                <td>1.33</td>
+                <td>1.31</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.50%</td>
+            </tr>
+            <tr>
+                <td>601390.XSHG</td>
+                <td>0.29574</td>
+                <td>5.53</td>
+                <td>5.52</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.18%</td>
+            </tr>
+            <tr>
+                <td>002064.XSHE</td>
+                <td>0.293765</td>
+                <td>7.77</td>
+                <td>6.69</td>
+                <td style="color:#e74c3c;font-weight:bold">-13.90%</td>
+            </tr>
+            <tr>
+                <td>002003.XSHE</td>
+                <td>0.288729</td>
+                <td>12.0</td>
+                <td>11.06</td>
+                <td style="color:#e74c3c;font-weight:bold">-7.83%</td>
+            </tr>
+            <tr>
+                <td>002865.XSHE</td>
+                <td>0.284836</td>
+                <td>50.27</td>
+                <td>39.87</td>
+                <td style="color:#e74c3c;font-weight:bold">-20.69%</td>
+            </tr>
+            <tr>
+                <td>688660.XSHG</td>
+                <td>0.282248</td>
+                <td>7.46</td>
+                <td>7.76</td>
+                <td style="color:#27ae60;font-weight:bold">+4.02%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-05 <span style="color:#27ae60">月收益: +1.84%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 96,496 | 累计: -3.50%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>000895.XSHE</td>
+                <td>0.296797</td>
+                <td>24.98</td>
+                <td>24.35</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.52%</td>
+            </tr>
+            <tr>
+                <td>000627.XSHE</td>
+                <td>0.237698</td>
+                <td>2.74</td>
+                <td>2.74</td>
+                <td style="color:#27ae60;font-weight:bold">+0.00%</td>
+            </tr>
+            <tr>
+                <td>300960.XSHE</td>
+                <td>0.229825</td>
+                <td>18.23</td>
+                <td>22.16</td>
+                <td style="color:#27ae60;font-weight:bold">+21.56%</td>
+            </tr>
+            <tr>
+                <td>301016.XSHE</td>
+                <td>0.228335</td>
+                <td>17.34</td>
+                <td>16.64</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.04%</td>
+            </tr>
+            <tr>
+                <td>600265.XSHG</td>
+                <td>0.228063</td>
+                <td>15.75</td>
+                <td>16.99</td>
+                <td style="color:#27ae60;font-weight:bold">+7.87%</td>
+            </tr>
+            <tr>
+                <td>600801.XSHG</td>
+                <td>0.225784</td>
+                <td>12.01</td>
+                <td>12.35</td>
+                <td style="color:#27ae60;font-weight:bold">+2.83%</td>
+            </tr>
+            <tr>
+                <td>600528.XSHG</td>
+                <td>0.22151</td>
+                <td>7.3</td>
+                <td>7.35</td>
+                <td style="color:#27ae60;font-weight:bold">+0.68%</td>
+            </tr>
+            <tr>
+                <td>002304.XSHE</td>
+                <td>0.219522</td>
+                <td>68.6</td>
+                <td>65.7</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.23%</td>
+            </tr>
+            <tr>
+                <td>002508.XSHE</td>
+                <td>0.217638</td>
+                <td>19.57</td>
+                <td>19.79</td>
+                <td style="color:#27ae60;font-weight:bold">+1.12%</td>
+            </tr>
+            <tr>
+                <td>002563.XSHE</td>
+                <td>0.216818</td>
+                <td>5.62</td>
+                <td>5.43</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.38%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-06 <span style="color:#27ae60">月收益: +9.08%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 105,255 | 累计: +5.25%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>002708.XSHE</td>
+                <td>0.33144</td>
+                <td>11.2</td>
+                <td>11.03</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.52%</td>
+            </tr>
+            <tr>
+                <td>301419.XSHE</td>
+                <td>0.32208</td>
+                <td>25.9</td>
+                <td>27.6</td>
+                <td style="color:#27ae60;font-weight:bold">+6.56%</td>
+            </tr>
+            <tr>
+                <td>688281.XSHG</td>
+                <td>0.318067</td>
+                <td>54.46</td>
+                <td>60.51</td>
+                <td style="color:#27ae60;font-weight:bold">+11.11%</td>
+            </tr>
+            <tr>
+                <td>002889.XSHE</td>
+                <td>0.309364</td>
+                <td>14.72</td>
+                <td>15.01</td>
+                <td style="color:#27ae60;font-weight:bold">+1.97%</td>
+            </tr>
+            <tr>
+                <td>603737.XSHG</td>
+                <td>0.306403</td>
+                <td>32.23</td>
+                <td>36.85</td>
+                <td style="color:#27ae60;font-weight:bold">+14.33%</td>
+            </tr>
+            <tr>
+                <td>600582.XSHG</td>
+                <td>0.303387</td>
+                <td>5.94</td>
+                <td>5.99</td>
+                <td style="color:#27ae60;font-weight:bold">+0.84%</td>
+            </tr>
+            <tr>
+                <td>301327.XSHE</td>
+                <td>0.299358</td>
+                <td>48.5</td>
+                <td>51.36</td>
+                <td style="color:#27ae60;font-weight:bold">+5.90%</td>
+            </tr>
+            <tr>
+                <td>688800.XSHG</td>
+                <td>0.296266</td>
+                <td>38.6</td>
+                <td>49.2</td>
+                <td style="color:#27ae60;font-weight:bold">+27.46%</td>
+            </tr>
+            <tr>
+                <td>002837.XSHE</td>
+                <td>0.295086</td>
+                <td>24.26</td>
+                <td>29.71</td>
+                <td style="color:#27ae60;font-weight:bold">+22.46%</td>
+            </tr>
+            <tr>
+                <td>301031.XSHE</td>
+                <td>0.288737</td>
+                <td>77.22</td>
+                <td>79.65</td>
+                <td style="color:#27ae60;font-weight:bold">+3.15%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-07 <span style="color:#27ae60">月收益: +6.06%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 111,633 | 累计: +11.63%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>600190.XSHG</td>
+                <td>0.286358</td>
+                <td>0.39</td>
+                <td>0.63</td>
+                <td style="color:#27ae60;font-weight:bold">+61.54%</td>
+            </tr>
+            <tr>
+                <td>000703.XSHE</td>
+                <td>0.267699</td>
+                <td>5.88</td>
+                <td>5.99</td>
+                <td style="color:#27ae60;font-weight:bold">+1.87%</td>
+            </tr>
+            <tr>
+                <td>300208.XSHE</td>
+                <td>0.261272</td>
+                <td>0.26</td>
+                <td>0.28</td>
+                <td style="color:#27ae60;font-weight:bold">+7.69%</td>
+            </tr>
+            <tr>
+                <td>300849.XSHE</td>
+                <td>0.249802</td>
+                <td>13.18</td>
+                <td>13.05</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.99%</td>
+            </tr>
+            <tr>
+                <td>600035.XSHG</td>
+                <td>0.248032</td>
+                <td>4.24</td>
+                <td>4.27</td>
+                <td style="color:#27ae60;font-weight:bold">+0.71%</td>
+            </tr>
+            <tr>
+                <td>601665.XSHG</td>
+                <td>0.22771</td>
+                <td>6.32</td>
+                <td>6.03</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.59%</td>
+            </tr>
+            <tr>
+                <td>300489.XSHE</td>
+                <td>0.221823</td>
+                <td>44.16</td>
+                <td>40.84</td>
+                <td style="color:#e74c3c;font-weight:bold">-7.52%</td>
+            </tr>
+            <tr>
+                <td>600566.XSHG</td>
+                <td>0.206841</td>
+                <td>26.33</td>
+                <td>26.85</td>
+                <td style="color:#27ae60;font-weight:bold">+1.97%</td>
+            </tr>
+            <tr>
+                <td>000719.XSHE</td>
+                <td>0.205541</td>
+                <td>12.41</td>
+                <td>12.84</td>
+                <td style="color:#27ae60;font-weight:bold">+3.46%</td>
+            </tr>
+            <tr>
+                <td>601098.XSHG</td>
+                <td>0.200004</td>
+                <td>13.12</td>
+                <td>12.85</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.06%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-08 <span style="color:#27ae60">月收益: +3.93%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 116,019 | 累计: +16.02%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>688585.XSHG</td>
+                <td>1.598907</td>
+                <td>92.07</td>
+                <td>83.0</td>
+                <td style="color:#e74c3c;font-weight:bold">-9.85%</td>
+            </tr>
+            <tr>
+                <td>603519.XSHG</td>
+                <td>0.287919</td>
+                <td>12.02</td>
+                <td>12.99</td>
+                <td style="color:#27ae60;font-weight:bold">+8.07%</td>
+            </tr>
+            <tr>
+                <td>300174.XSHE</td>
+                <td>0.263433</td>
+                <td>15.04</td>
+                <td>17.49</td>
+                <td style="color:#27ae60;font-weight:bold">+16.29%</td>
+            </tr>
+            <tr>
+                <td>001965.XSHE</td>
+                <td>0.257797</td>
+                <td>11.21</td>
+                <td>10.41</td>
+                <td style="color:#e74c3c;font-weight:bold">-7.14%</td>
+            </tr>
+            <tr>
+                <td>600377.XSHG</td>
+                <td>0.257772</td>
+                <td>14.16</td>
+                <td>13.41</td>
+                <td style="color:#e74c3c;font-weight:bold">-5.30%</td>
+            </tr>
+            <tr>
+                <td>000598.XSHE</td>
+                <td>0.253401</td>
+                <td>7.11</td>
+                <td>6.82</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.08%</td>
+            </tr>
+            <tr>
+                <td>600665.XSHG</td>
+                <td>0.252653</td>
+                <td>3.22</td>
+                <td>3.35</td>
+                <td style="color:#27ae60;font-weight:bold">+4.04%</td>
+            </tr>
+            <tr>
+                <td>002726.XSHE</td>
+                <td>0.251462</td>
+                <td>5.41</td>
+                <td>5.41</td>
+                <td style="color:#27ae60;font-weight:bold">+0.00%</td>
+            </tr>
+            <tr>
+                <td>002715.XSHE</td>
+                <td>0.24664</td>
+                <td>16.86</td>
+                <td>23.01</td>
+                <td style="color:#27ae60;font-weight:bold">+36.48%</td>
+            </tr>
+            <tr>
+                <td>002512.XSHE</td>
+                <td>0.243665</td>
+                <td>3.94</td>
+                <td>4.03</td>
+                <td style="color:#27ae60;font-weight:bold">+2.28%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-09 <span style="color:#e74c3c">月收益: -4.44%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 110,865 | 累计: +10.86%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>000651.XSHE</td>
+                <td>0.318365</td>
+                <td>42.6</td>
+                <td>39.72</td>
+                <td style="color:#e74c3c;font-weight:bold">-6.76%</td>
+            </tr>
+            <tr>
+                <td>600035.XSHG</td>
+                <td>0.311338</td>
+                <td>4.16</td>
+                <td>3.95</td>
+                <td style="color:#e74c3c;font-weight:bold">-5.05%</td>
+            </tr>
+            <tr>
+                <td>001207.XSHE</td>
+                <td>0.276959</td>
+                <td>24.01</td>
+                <td>22.91</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.58%</td>
+            </tr>
+            <tr>
+                <td>603759.XSHG</td>
+                <td>0.275865</td>
+                <td>7.97</td>
+                <td>7.7</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.39%</td>
+            </tr>
+            <tr>
+                <td>600674.XSHG</td>
+                <td>0.272071</td>
+                <td>14.89</td>
+                <td>14.28</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.10%</td>
+            </tr>
+            <tr>
+                <td>301030.XSHE</td>
+                <td>0.269258</td>
+                <td>16.73</td>
+                <td>15.11</td>
+                <td style="color:#e74c3c;font-weight:bold">-9.68%</td>
+            </tr>
+            <tr>
+                <td>688358.XSHG</td>
+                <td>0.255202</td>
+                <td>31.32</td>
+                <td>32.9</td>
+                <td style="color:#27ae60;font-weight:bold">+5.04%</td>
+            </tr>
+            <tr>
+                <td>300154.XSHE</td>
+                <td>0.253243</td>
+                <td>8.73</td>
+                <td>8.45</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.21%</td>
+            </tr>
+            <tr>
+                <td>001387.XSHE</td>
+                <td>0.252361</td>
+                <td>13.82</td>
+                <td>13.5</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.32%</td>
+            </tr>
+            <tr>
+                <td>301320.XSHE</td>
+                <td>0.252242</td>
+                <td>19.9</td>
+                <td>18.13</td>
+                <td style="color:#e74c3c;font-weight:bold">-8.89%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-10 <span style="color:#e74c3c">月收益: -0.70%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 110,093 | 累计: +10.09%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>002818.XSHE</td>
+                <td>0.267795</td>
+                <td>11.73</td>
+                <td>11.36</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.15%</td>
+            </tr>
+            <tr>
+                <td>002743.XSHE</td>
+                <td>0.254473</td>
+                <td>5.01</td>
+                <td>5.49</td>
+                <td style="color:#27ae60;font-weight:bold">+9.58%</td>
+            </tr>
+            <tr>
+                <td>601006.XSHG</td>
+                <td>0.246536</td>
+                <td>5.89</td>
+                <td>5.73</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.72%</td>
+            </tr>
+            <tr>
+                <td>600566.XSHG</td>
+                <td>0.236465</td>
+                <td>24.32</td>
+                <td>25.06</td>
+                <td style="color:#27ae60;font-weight:bold">+3.04%</td>
+            </tr>
+            <tr>
+                <td>601827.XSHG</td>
+                <td>0.226945</td>
+                <td>8.18</td>
+                <td>8.45</td>
+                <td style="color:#27ae60;font-weight:bold">+3.30%</td>
+            </tr>
+            <tr>
+                <td>000505.XSHE</td>
+                <td>0.21665</td>
+                <td>6.09</td>
+                <td>6.8</td>
+                <td style="color:#27ae60;font-weight:bold">+11.66%</td>
+            </tr>
+            <tr>
+                <td>600925.XSHG</td>
+                <td>0.214313</td>
+                <td>4.81</td>
+                <td>4.89</td>
+                <td style="color:#27ae60;font-weight:bold">+1.66%</td>
+            </tr>
+            <tr>
+                <td>605319.XSHG</td>
+                <td>0.208235</td>
+                <td>25.6</td>
+                <td>22.47</td>
+                <td style="color:#e74c3c;font-weight:bold">-12.23%</td>
+            </tr>
+            <tr>
+                <td>600376.XSHG</td>
+                <td>0.207228</td>
+                <td>7.48</td>
+                <td>6.15</td>
+                <td style="color:#e74c3c;font-weight:bold">-17.78%</td>
+            </tr>
+            <tr>
+                <td>601816.XSHG</td>
+                <td>0.201435</td>
+                <td>5.13</td>
+                <td>5.19</td>
+                <td style="color:#27ae60;font-weight:bold">+1.17%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-11 <span style="color:#e74c3c">月收益: -1.60%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 108,337 | 累计: +8.34%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>601333.XSHG</td>
+                <td>0.290098</td>
+                <td>3.06</td>
+                <td>3.04</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.65%</td>
+            </tr>
+            <tr>
+                <td>603089.XSHG</td>
+                <td>0.277388</td>
+                <td>13.89</td>
+                <td>12.89</td>
+                <td style="color:#e74c3c;font-weight:bold">-7.20%</td>
+            </tr>
+            <tr>
+                <td>002597.XSHE</td>
+                <td>0.269514</td>
+                <td>20.08</td>
+                <td>20.34</td>
+                <td style="color:#27ae60;font-weight:bold">+1.29%</td>
+            </tr>
+            <tr>
+                <td>601811.XSHG</td>
+                <td>0.259734</td>
+                <td>14.35</td>
+                <td>13.95</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.79%</td>
+            </tr>
+            <tr>
+                <td>002727.XSHE</td>
+                <td>0.252844</td>
+                <td>13.41</td>
+                <td>12.99</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.13%</td>
+            </tr>
+            <tr>
+                <td>600655.XSHG</td>
+                <td>0.244485</td>
+                <td>5.56</td>
+                <td>5.36</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.60%</td>
+            </tr>
+            <tr>
+                <td>603639.XSHG</td>
+                <td>0.242798</td>
+                <td>13.29</td>
+                <td>12.76</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.99%</td>
+            </tr>
+            <tr>
+                <td>603609.XSHG</td>
+                <td>0.224816</td>
+                <td>7.67</td>
+                <td>7.57</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.30%</td>
+            </tr>
+            <tr>
+                <td>000039.XSHE</td>
+                <td>0.221028</td>
+                <td>7.89</td>
+                <td>9.08</td>
+                <td style="color:#27ae60;font-weight:bold">+15.08%</td>
+            </tr>
+            <tr>
+                <td>603111.XSHG</td>
+                <td>0.212746</td>
+                <td>7.59</td>
+                <td>6.97</td>
+                <td style="color:#e74c3c;font-weight:bold">-8.17%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-12 <span style="color:#e74c3c">月收益: -7.90%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 99,778 | 累计: -0.22%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>000002.XSHE</td>
+                <td>0.237678</td>
+                <td>5.38</td>
+                <td>4.65</td>
+                <td style="color:#e74c3c;font-weight:bold">-13.57%</td>
+            </tr>
+            <tr>
+                <td>603392.XSHG</td>
+                <td>0.219025</td>
+                <td>48.02</td>
+                <td>44.94</td>
+                <td style="color:#e74c3c;font-weight:bold">-6.41%</td>
+            </tr>
+            <tr>
+                <td>002352.XSHE</td>
+                <td>0.214248</td>
+                <td>38.37</td>
+                <td>38.32</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.13%</td>
+            </tr>
+            <tr>
+                <td>600529.XSHG</td>
+                <td>0.203615</td>
+                <td>20.13</td>
+                <td>19.93</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.99%</td>
+            </tr>
+            <tr>
+                <td>600861.XSHG</td>
+                <td>0.203186</td>
+                <td>18.07</td>
+                <td>18.34</td>
+                <td style="color:#27ae60;font-weight:bold">+1.49%</td>
+            </tr>
+            <tr>
+                <td>600696.XSHG</td>
+                <td>0.200499</td>
+                <td>4.92</td>
+                <td>2.9</td>
+                <td style="color:#e74c3c;font-weight:bold">-41.06%</td>
+            </tr>
+            <tr>
+                <td>600436.XSHG</td>
+                <td>0.198492</td>
+                <td>171.87</td>
+                <td>168.78</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.80%</td>
+            </tr>
+            <tr>
+                <td>600600.XSHG</td>
+                <td>0.198353</td>
+                <td>63.55</td>
+                <td>61.2</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.70%</td>
+            </tr>
+            <tr>
+                <td>600161.XSHG</td>
+                <td>0.194887</td>
+                <td>17.29</td>
+                <td>16.34</td>
+                <td style="color:#e74c3c;font-weight:bold">-5.49%</td>
+            </tr>
+            <tr>
+                <td>601006.XSHG</td>
+                <td>0.193035</td>
+                <td>5.48</td>
+                <td>5.16</td>
+                <td style="color:#e74c3c;font-weight:bold">-5.84%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-01 <span style="color:#27ae60">月收益: +0.85%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 100,628 | 累计: +0.63%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>001331.XSHE</td>
+                <td>0.269318</td>
+                <td>46.31</td>
+                <td>53.67</td>
+                <td style="color:#27ae60;font-weight:bold">+15.89%</td>
+            </tr>
+            <tr>
+                <td>600906.XSHG</td>
+                <td>0.237244</td>
+                <td>6.67</td>
+                <td>6.84</td>
+                <td style="color:#27ae60;font-weight:bold">+2.55%</td>
+            </tr>
+            <tr>
+                <td>301039.XSHE</td>
+                <td>0.237158</td>
+                <td>9.15</td>
+                <td>9.72</td>
+                <td style="color:#27ae60;font-weight:bold">+6.23%</td>
+            </tr>
+            <tr>
+                <td>002528.XSHE</td>
+                <td>0.231703</td>
+                <td>2.68</td>
+                <td>2.37</td>
+                <td style="color:#e74c3c;font-weight:bold">-11.57%</td>
+            </tr>
+            <tr>
+                <td>300760.XSHE</td>
+                <td>0.227769</td>
+                <td>190.45</td>
+                <td>189.26</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.62%</td>
+            </tr>
+            <tr>
+                <td>002304.XSHE</td>
+                <td>0.227423</td>
+                <td>60.74</td>
+                <td>55.32</td>
+                <td style="color:#e74c3c;font-weight:bold">-8.92%</td>
+            </tr>
+            <tr>
+                <td>000690.XSHE</td>
+                <td>0.225865</td>
+                <td>4.19</td>
+                <td>4.47</td>
+                <td style="color:#27ae60;font-weight:bold">+6.68%</td>
+            </tr>
+            <tr>
+                <td>600098.XSHG</td>
+                <td>0.225399</td>
+                <td>6.54</td>
+                <td>7.16</td>
+                <td style="color:#27ae60;font-weight:bold">+9.48%</td>
+            </tr>
+            <tr>
+                <td>600720.XSHG</td>
+                <td>0.224122</td>
+                <td>7.22</td>
+                <td>7.41</td>
+                <td style="color:#27ae60;font-weight:bold">+2.63%</td>
+            </tr>
+            <tr>
+                <td>605199.XSHG</td>
+                <td>0.221084</td>
+                <td>7.62</td>
+                <td>6.68</td>
+                <td style="color:#e74c3c;font-weight:bold">-12.34%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-02 <span style="color:#27ae60">月收益: +2.72%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 103,368 | 累计: +3.37%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>300986.XSHE</td>
+                <td>0.3282</td>
+                <td>37.35</td>
+                <td>30.19</td>
+                <td style="color:#e74c3c;font-weight:bold">-19.17%</td>
+            </tr>
+            <tr>
+                <td>600327.XSHG</td>
+                <td>0.305461</td>
+                <td>4.64</td>
+                <td>4.26</td>
+                <td style="color:#e74c3c;font-weight:bold">-8.19%</td>
+            </tr>
+            <tr>
+                <td>300709.XSHE</td>
+                <td>0.284668</td>
+                <td>41.22</td>
+                <td>43.38</td>
+                <td style="color:#27ae60;font-weight:bold">+5.24%</td>
+            </tr>
+            <tr>
+                <td>002227.XSHE</td>
+                <td>0.279892</td>
+                <td>10.76</td>
+                <td>10.08</td>
+                <td style="color:#e74c3c;font-weight:bold">-6.32%</td>
+            </tr>
+            <tr>
+                <td>000826.XSHE</td>
+                <td>0.278781</td>
+                <td>2.02</td>
+                <td>2.81</td>
+                <td style="color:#27ae60;font-weight:bold">+39.11%</td>
+            </tr>
+            <tr>
+                <td>002139.XSHE</td>
+                <td>0.26723</td>
+                <td>12.86</td>
+                <td>13.26</td>
+                <td style="color:#27ae60;font-weight:bold">+3.11%</td>
+            </tr>
+            <tr>
+                <td>000009.XSHE</td>
+                <td>0.260583</td>
+                <td>9.61</td>
+                <td>9.55</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.62%</td>
+            </tr>
+            <tr>
+                <td>600208.XSHG</td>
+                <td>0.25564</td>
+                <td>3.7</td>
+                <td>3.73</td>
+                <td style="color:#27ae60;font-weight:bold">+0.81%</td>
+            </tr>
+            <tr>
+                <td>300632.XSHE</td>
+                <td>0.253564</td>
+                <td>13.74</td>
+                <td>14.7</td>
+                <td style="color:#27ae60;font-weight:bold">+6.99%</td>
+            </tr>
+            <tr>
+                <td>300211.XSHE</td>
+                <td>0.246058</td>
+                <td>8.48</td>
+                <td>9.14</td>
+                <td style="color:#27ae60;font-weight:bold">+7.78%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-03 <span style="color:#e74c3c">月收益: -6.65%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 96,498 | 累计: -3.50%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>000651.XSHE</td>
+                <td>0.205944</td>
+                <td>37.45</td>
+                <td>37.82</td>
+                <td style="color:#27ae60;font-weight:bold">+0.99%</td>
+            </tr>
+            <tr>
+                <td>601398.XSHG</td>
+                <td>0.203037</td>
+                <td>6.92</td>
+                <td>7.64</td>
+                <td style="color:#27ae60;font-weight:bold">+10.40%</td>
+            </tr>
+            <tr>
+                <td>603081.XSHG</td>
+                <td>0.196158</td>
+                <td>13.38</td>
+                <td>11.67</td>
+                <td style="color:#e74c3c;font-weight:bold">-12.78%</td>
+            </tr>
+            <tr>
+                <td>601319.XSHG</td>
+                <td>0.194057</td>
+                <td>8.57</td>
+                <td>7.27</td>
+                <td style="color:#e74c3c;font-weight:bold">-15.17%</td>
+            </tr>
+            <tr>
+                <td>688235.XSHG</td>
+                <td>0.191896</td>
+                <td>257.7</td>
+                <td>233.59</td>
+                <td style="color:#e74c3c;font-weight:bold">-9.36%</td>
+            </tr>
+            <tr>
+                <td>601628.XSHG</td>
+                <td>0.186804</td>
+                <td>44.48</td>
+                <td>36.34</td>
+                <td style="color:#e74c3c;font-weight:bold">-18.30%</td>
+            </tr>
+            <tr>
+                <td>601211.XSHG</td>
+                <td>0.186666</td>
+                <td>18.93</td>
+                <td>16.59</td>
+                <td style="color:#e74c3c;font-weight:bold">-12.36%</td>
+            </tr>
+            <tr>
+                <td>601601.XSHG</td>
+                <td>0.18549</td>
+                <td>40.81</td>
+                <td>37.09</td>
+                <td style="color:#e74c3c;font-weight:bold">-9.12%</td>
+            </tr>
+            <tr>
+                <td>600066.XSHG</td>
+                <td>0.180667</td>
+                <td>29.69</td>
+                <td>35.86</td>
+                <td style="color:#27ae60;font-weight:bold">+20.78%</td>
+            </tr>
+            <tr>
+                <td>002856.XSHE</td>
+                <td>0.173887</td>
+                <td>14.06</td>
+                <td>11.24</td>
+                <td style="color:#e74c3c;font-weight:bold">-20.06%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-04 <span style="color:#e74c3c">月收益: -4.75%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 91,912 | 累计: -8.09%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>300926.XSHE</td>
+                <td>0.281507</td>
+                <td>25.86</td>
+                <td>22.77</td>
+                <td style="color:#e74c3c;font-weight:bold">-11.95%</td>
+            </tr>
+            <tr>
+                <td>601865.XSHG</td>
+                <td>0.264307</td>
+                <td>14.19</td>
+                <td>13.52</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.72%</td>
+            </tr>
+            <tr>
+                <td>688175.XSHG</td>
+                <td>0.237902</td>
+                <td>33.5</td>
+                <td>36.67</td>
+                <td style="color:#27ae60;font-weight:bold">+9.46%</td>
+            </tr>
+            <tr>
+                <td>601107.XSHG</td>
+                <td>0.237466</td>
+                <td>5.79</td>
+                <td>6.13</td>
+                <td style="color:#27ae60;font-weight:bold">+5.87%</td>
+            </tr>
+            <tr>
+                <td>002052.XSHE</td>
+                <td>0.234781</td>
+                <td>10.39</td>
+                <td>10.09</td>
+                <td style="color:#e74c3c;font-weight:bold">-2.89%</td>
+            </tr>
+            <tr>
+                <td>603212.XSHG</td>
+                <td>0.230965</td>
+                <td>13.03</td>
+                <td>13.7</td>
+                <td style="color:#27ae60;font-weight:bold">+5.14%</td>
+            </tr>
+            <tr>
+                <td>600027.XSHG</td>
+                <td>0.230061</td>
+                <td>4.71</td>
+                <td>4.99</td>
+                <td style="color:#27ae60;font-weight:bold">+5.94%</td>
+            </tr>
+            <tr>
+                <td>300344.XSHE</td>
+                <td>0.228811</td>
+                <td>0.5</td>
+                <td>0.25</td>
+                <td style="color:#e74c3c;font-weight:bold">-50.00%</td>
+            </tr>
+            <tr>
+                <td>603396.XSHG</td>
+                <td>0.226234</td>
+                <td>35.99</td>
+                <td>35.28</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.97%</td>
+            </tr>
+            <tr>
+                <td>001269.XSHE</td>
+                <td>0.22501</td>
+                <td>21.76</td>
+                <td>21.56</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.92%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-05 <span style="color:#e74c3c">月收益: -2.58%</span>
+                <span style="font-size:14px;color:#666"> | 组合市值: 89,538 | 累计: -10.46%</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>股票代码</th><th>综合得分</th><th>买入价</th><th>卖出价</th><th>月收益</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>688236.XSHG</td>
+                <td>0.288973</td>
+                <td>17.3</td>
+                <td>17.14</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.92%</td>
+            </tr>
+            <tr>
+                <td>000401.XSHE</td>
+                <td>0.278323</td>
+                <td>4.28</td>
+                <td>4.11</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.97%</td>
+            </tr>
+            <tr>
+                <td>300996.XSHE</td>
+                <td>0.274645</td>
+                <td>12.5</td>
+                <td>12.35</td>
+                <td style="color:#e74c3c;font-weight:bold">-1.20%</td>
+            </tr>
+            <tr>
+                <td>605599.XSHG</td>
+                <td>0.273921</td>
+                <td>19.19</td>
+                <td>16.78</td>
+                <td style="color:#e74c3c;font-weight:bold">-12.56%</td>
+            </tr>
+            <tr>
+                <td>688789.XSHG</td>
+                <td>0.270811</td>
+                <td>60.12</td>
+                <td>57.93</td>
+                <td style="color:#e74c3c;font-weight:bold">-3.64%</td>
+            </tr>
+            <tr>
+                <td>301016.XSHE</td>
+                <td>0.264612</td>
+                <td>16.29</td>
+                <td>17.97</td>
+                <td style="color:#27ae60;font-weight:bold">+10.31%</td>
+            </tr>
+            <tr>
+                <td>603313.XSHG</td>
+                <td>0.261029</td>
+                <td>6.42</td>
+                <td>5.9</td>
+                <td style="color:#e74c3c;font-weight:bold">-8.10%</td>
+            </tr>
+            <tr>
+                <td>600620.XSHG</td>
+                <td>0.260358</td>
+                <td>5.52</td>
+                <td>5.28</td>
+                <td style="color:#e74c3c;font-weight:bold">-4.35%</td>
+            </tr>
+            <tr>
+                <td>603282.XSHG</td>
+                <td>0.258531</td>
+                <td>17.85</td>
+                <td>18.01</td>
+                <td style="color:#27ae60;font-weight:bold">+0.90%</td>
+            </tr>
+            <tr>
+                <td>603192.XSHG</td>
+                <td>0.257133</td>
+                <td>22.72</td>
+                <td>22.54</td>
+                <td style="color:#e74c3c;font-weight:bold">-0.79%</td>
+            </tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="compare" class="tab-content">
+        <h2>我的选择 vs 实际起飞股票</h2>
+        <p style="color:#888;margin-bottom:15px">  表示我的组合中包含该股票。每月实际涨幅TOP10与我的选股对比。</p>
+        
+        <div class="month-card">
+            <h3>2025-04 对比
+                <span style="color:#e74c3c">我的月均: -5.25%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>301209.XSHE </td>
+                <td>36.42</td>
+                <td>94.36</td>
+                <td style="color:#27ae60;font-weight:bold">+159.09%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>601086.XSHG </td>
+                <td>4.62</td>
+                <td>10.03</td>
+                <td style="color:#27ae60;font-weight:bold">+117.10%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>002165.XSHE </td>
+                <td>6.09</td>
+                <td>12.44</td>
+                <td style="color:#27ae60;font-weight:bold">+104.27%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>002289.XSHE </td>
+                <td>4.78</td>
+                <td>9.01</td>
+                <td style="color:#27ae60;font-weight:bold">+88.49%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>001212.XSHE </td>
+                <td>29.27</td>
+                <td>54.36</td>
+                <td style="color:#27ae60;font-weight:bold">+85.72%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>300972.XSHE </td>
+                <td>90.13</td>
+                <td>164.75</td>
+                <td style="color:#27ae60;font-weight:bold">+82.79%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>603696.XSHG </td>
+                <td>8.28</td>
+                <td>14.63</td>
+                <td style="color:#27ae60;font-weight:bold">+76.69%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>600644.XSHG </td>
+                <td>6.64</td>
+                <td>11.40</td>
+                <td style="color:#27ae60;font-weight:bold">+71.69%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>300652.XSHE </td>
+                <td>42.55</td>
+                <td>72.42</td>
+                <td style="color:#27ae60;font-weight:bold">+70.20%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>002915.XSHE </td>
+                <td>12.88</td>
+                <td>21.37</td>
+                <td style="color:#27ae60;font-weight:bold">+65.92%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-05 对比
+                <span style="color:#27ae60">我的月均: +1.84%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>688648.XSHG </td>
+                <td>26.10</td>
+                <td>67.15</td>
+                <td style="color:#27ae60;font-weight:bold">+157.28%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>300204.XSHE </td>
+                <td>10.80</td>
+                <td>26.50</td>
+                <td style="color:#27ae60;font-weight:bold">+145.37%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>002735.XSHE </td>
+                <td>9.44</td>
+                <td>19.67</td>
+                <td style="color:#27ae60;font-weight:bold">+108.37%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>603011.XSHG </td>
+                <td>9.80</td>
+                <td>20.40</td>
+                <td style="color:#27ae60;font-weight:bold">+108.16%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>002190.XSHE </td>
+                <td>16.62</td>
+                <td>33.16</td>
+                <td style="color:#27ae60;font-weight:bold">+99.52%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>688336.XSHG </td>
+                <td>29.08</td>
+                <td>58.00</td>
+                <td style="color:#27ae60;font-weight:bold">+99.45%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>603389.XSHG </td>
+                <td>6.12</td>
+                <td>11.82</td>
+                <td style="color:#27ae60;font-weight:bold">+93.14%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>300963.XSHE </td>
+                <td>15.14</td>
+                <td>29.20</td>
+                <td style="color:#27ae60;font-weight:bold">+92.87%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>605136.XSHG </td>
+                <td>7.42</td>
+                <td>14.13</td>
+                <td style="color:#27ae60;font-weight:bold">+90.43%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>300946.XSHE </td>
+                <td>35.80</td>
+                <td>67.90</td>
+                <td style="color:#27ae60;font-weight:bold">+89.66%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-06 对比
+                <span style="color:#27ae60">我的月均: +9.08%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>301357.XSHE </td>
+                <td>36.72</td>
+                <td>95.46</td>
+                <td style="color:#27ae60;font-weight:bold">+159.97%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>002940.XSHE </td>
+                <td>15.06</td>
+                <td>37.11</td>
+                <td style="color:#27ae60;font-weight:bold">+146.41%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>002104.XSHE </td>
+                <td>8.91</td>
+                <td>19.91</td>
+                <td style="color:#27ae60;font-weight:bold">+123.46%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>300340.XSHE </td>
+                <td>9.82</td>
+                <td>21.80</td>
+                <td style="color:#27ae60;font-weight:bold">+122.00%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>601606.XSHG </td>
+                <td>13.43</td>
+                <td>29.05</td>
+                <td style="color:#27ae60;font-weight:bold">+116.31%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>600110.XSHG </td>
+                <td>3.32</td>
+                <td>6.99</td>
+                <td style="color:#27ae60;font-weight:bold">+110.54%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300468.XSHE </td>
+                <td>24.79</td>
+                <td>50.49</td>
+                <td style="color:#27ae60;font-weight:bold">+103.67%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>603928.XSHG </td>
+                <td>10.02</td>
+                <td>19.79</td>
+                <td style="color:#27ae60;font-weight:bold">+97.50%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>002235.XSHE </td>
+                <td>5.48</td>
+                <td>10.60</td>
+                <td style="color:#27ae60;font-weight:bold">+93.43%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>300591.XSHE </td>
+                <td>5.91</td>
+                <td>11.25</td>
+                <td style="color:#27ae60;font-weight:bold">+90.36%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-07 对比
+                <span style="color:#27ae60">我的月均: +6.06%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>688585.XSHG </td>
+                <td>7.78</td>
+                <td>92.07</td>
+                <td style="color:#27ae60;font-weight:bold">+1083.42%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>300436.XSHE </td>
+                <td>35.90</td>
+                <td>114.50</td>
+                <td style="color:#27ae60;font-weight:bold">+218.94%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>600749.XSHG </td>
+                <td>11.87</td>
+                <td>28.20</td>
+                <td style="color:#27ae60;font-weight:bold">+137.57%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>688189.XSHG </td>
+                <td>7.44</td>
+                <td>17.14</td>
+                <td style="color:#27ae60;font-weight:bold">+130.38%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>600326.XSHG </td>
+                <td>8.56</td>
+                <td>19.15</td>
+                <td style="color:#27ae60;font-weight:bold">+123.71%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>300528.XSHE </td>
+                <td>10.42</td>
+                <td>23.22</td>
+                <td style="color:#27ae60;font-weight:bold">+122.84%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300683.XSHE </td>
+                <td>25.70</td>
+                <td>56.33</td>
+                <td style="color:#27ae60;font-weight:bold">+119.18%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>603280.XSHG </td>
+                <td>25.19</td>
+                <td>54.86</td>
+                <td style="color:#27ae60;font-weight:bold">+117.78%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>603367.XSHG </td>
+                <td>14.02</td>
+                <td>30.01</td>
+                <td style="color:#27ae60;font-weight:bold">+114.05%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>688221.XSHG </td>
+                <td>10.04</td>
+                <td>21.47</td>
+                <td style="color:#27ae60;font-weight:bold">+113.84%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-08 对比
+                <span style="color:#27ae60">我的月均: +3.93%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>688228.XSHG </td>
+                <td>62.04</td>
+                <td>153.80</td>
+                <td style="color:#27ae60;font-weight:bold">+147.90%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>688108.XSHG </td>
+                <td>13.73</td>
+                <td>33.19</td>
+                <td style="color:#27ae60;font-weight:bold">+141.73%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>601929.XSHG </td>
+                <td>1.94</td>
+                <td>4.55</td>
+                <td style="color:#27ae60;font-weight:bold">+134.54%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>688577.XSHG </td>
+                <td>51.22</td>
+                <td>119.70</td>
+                <td style="color:#27ae60;font-weight:bold">+133.70%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>600410.XSHG </td>
+                <td>10.92</td>
+                <td>23.49</td>
+                <td style="color:#27ae60;font-weight:bold">+115.11%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>688256.XSHG </td>
+                <td>709.50</td>
+                <td>1492.49</td>
+                <td style="color:#27ae60;font-weight:bold">+110.36%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>603757.XSHG </td>
+                <td>26.13</td>
+                <td>54.56</td>
+                <td style="color:#27ae60;font-weight:bold">+108.80%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>300843.XSHE </td>
+                <td>30.97</td>
+                <td>63.59</td>
+                <td style="color:#27ae60;font-weight:bold">+105.33%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>600113.XSHG </td>
+                <td>28.94</td>
+                <td>59.13</td>
+                <td style="color:#27ae60;font-weight:bold">+104.32%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>605298.XSHG </td>
+                <td>15.08</td>
+                <td>30.65</td>
+                <td style="color:#27ae60;font-weight:bold">+103.25%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-09 对比
+                <span style="color:#e74c3c">我的月均: -4.44%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>600376.XSHG </td>
+                <td>2.66</td>
+                <td>7.48</td>
+                <td style="color:#27ae60;font-weight:bold">+181.20%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>688411.XSHG </td>
+                <td>127.77</td>
+                <td>323.92</td>
+                <td style="color:#27ae60;font-weight:bold">+153.52%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>688109.XSHG </td>
+                <td>41.95</td>
+                <td>100.60</td>
+                <td style="color:#27ae60;font-weight:bold">+139.81%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>605255.XSHG </td>
+                <td>47.19</td>
+                <td>111.28</td>
+                <td style="color:#27ae60;font-weight:bold">+135.81%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>001309.XSHE </td>
+                <td>94.32</td>
+                <td>204.69</td>
+                <td style="color:#27ae60;font-weight:bold">+117.02%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>300475.XSHE </td>
+                <td>42.14</td>
+                <td>91.26</td>
+                <td style="color:#27ae60;font-weight:bold">+116.56%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300959.XSHE </td>
+                <td>45.62</td>
+                <td>96.82</td>
+                <td style="color:#27ae60;font-weight:bold">+112.23%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>002513.XSHE </td>
+                <td>5.10</td>
+                <td>10.40</td>
+                <td style="color:#27ae60;font-weight:bold">+103.92%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>603843.XSHG </td>
+                <td>2.69</td>
+                <td>5.43</td>
+                <td style="color:#27ae60;font-weight:bold">+101.86%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>688335.XSHG </td>
+                <td>15.25</td>
+                <td>30.40</td>
+                <td style="color:#27ae60;font-weight:bold">+99.34%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-10 对比
+                <span style="color:#e74c3c">我的月均: -0.70%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>300300.XSHE </td>
+                <td>4.94</td>
+                <td>10.25</td>
+                <td style="color:#27ae60;font-weight:bold">+107.49%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>603301.XSHG </td>
+                <td>46.66</td>
+                <td>95.00</td>
+                <td style="color:#27ae60;font-weight:bold">+103.60%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>002713.XSHE </td>
+                <td>5.70</td>
+                <td>11.38</td>
+                <td style="color:#27ae60;font-weight:bold">+99.65%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>000592.XSHE </td>
+                <td>3.55</td>
+                <td>7.08</td>
+                <td style="color:#27ae60;font-weight:bold">+99.44%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>605178.XSHG </td>
+                <td>35.83</td>
+                <td>69.83</td>
+                <td style="color:#27ae60;font-weight:bold">+94.89%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>600403.XSHG </td>
+                <td>4.06</td>
+                <td>7.91</td>
+                <td style="color:#27ae60;font-weight:bold">+94.83%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>000638.XSHE </td>
+                <td>3.75</td>
+                <td>7.18</td>
+                <td style="color:#27ae60;font-weight:bold">+91.47%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>301563.XSHE </td>
+                <td>116.80</td>
+                <td>204.17</td>
+                <td style="color:#27ae60;font-weight:bold">+74.80%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>301377.XSHE </td>
+                <td>71.69</td>
+                <td>123.00</td>
+                <td style="color:#27ae60;font-weight:bold">+71.57%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>301292.XSHE </td>
+                <td>21.13</td>
+                <td>36.25</td>
+                <td style="color:#27ae60;font-weight:bold">+71.56%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-11 对比
+                <span style="color:#e74c3c">我的月均: -1.60%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>603778.XSHG </td>
+                <td>4.53</td>
+                <td>11.59</td>
+                <td style="color:#27ae60;font-weight:bold">+155.85%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>603122.XSHG </td>
+                <td>9.79</td>
+                <td>23.82</td>
+                <td style="color:#27ae60;font-weight:bold">+143.31%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>688353.XSHG </td>
+                <td>48.09</td>
+                <td>111.80</td>
+                <td style="color:#27ae60;font-weight:bold">+132.48%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>688227.XSHG </td>
+                <td>35.20</td>
+                <td>81.83</td>
+                <td style="color:#27ae60;font-weight:bold">+132.47%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>301292.XSHE </td>
+                <td>36.25</td>
+                <td>80.62</td>
+                <td style="color:#27ae60;font-weight:bold">+122.40%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>300437.XSHE </td>
+                <td>9.92</td>
+                <td>20.30</td>
+                <td style="color:#27ae60;font-weight:bold">+104.64%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300456.XSHE </td>
+                <td>24.49</td>
+                <td>48.51</td>
+                <td style="color:#27ae60;font-weight:bold">+98.08%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>300477.XSHE </td>
+                <td>2.02</td>
+                <td>3.81</td>
+                <td style="color:#27ae60;font-weight:bold">+88.61%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>603216.XSHG </td>
+                <td>15.82</td>
+                <td>28.66</td>
+                <td style="color:#27ae60;font-weight:bold">+81.16%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>003041.XSHE </td>
+                <td>30.04</td>
+                <td>53.80</td>
+                <td style="color:#27ae60;font-weight:bold">+79.09%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2025-12 对比
+                <span style="color:#e74c3c">我的月均: -7.90%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>002969.XSHE </td>
+                <td>3.86</td>
+                <td>12.66</td>
+                <td style="color:#27ae60;font-weight:bold">+227.98%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>001331.XSHE </td>
+                <td>14.32</td>
+                <td>46.31</td>
+                <td style="color:#27ae60;font-weight:bold">+223.39%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>301232.XSHE </td>
+                <td>58.78</td>
+                <td>168.37</td>
+                <td style="color:#27ae60;font-weight:bold">+186.44%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>002149.XSHE </td>
+                <td>17.63</td>
+                <td>45.51</td>
+                <td style="color:#27ae60;font-weight:bold">+158.14%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>603601.XSHG </td>
+                <td>5.06</td>
+                <td>12.47</td>
+                <td style="color:#27ae60;font-weight:bold">+146.44%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>000547.XSHE </td>
+                <td>13.51</td>
+                <td>33.01</td>
+                <td style="color:#27ae60;font-weight:bold">+144.34%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>301005.XSHE </td>
+                <td>66.38</td>
+                <td>155.27</td>
+                <td style="color:#27ae60;font-weight:bold">+133.91%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>002565.XSHE </td>
+                <td>8.03</td>
+                <td>18.33</td>
+                <td style="color:#27ae60;font-weight:bold">+128.27%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>002361.XSHE </td>
+                <td>6.34</td>
+                <td>14.34</td>
+                <td style="color:#27ae60;font-weight:bold">+126.18%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>002788.XSHE </td>
+                <td>9.68</td>
+                <td>21.18</td>
+                <td style="color:#27ae60;font-weight:bold">+118.80%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-01 对比
+                <span style="color:#27ae60">我的月均: +0.85%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>300986.XSHE </td>
+                <td>11.18</td>
+                <td>37.35</td>
+                <td style="color:#27ae60;font-weight:bold">+234.08%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>002931.XSHE </td>
+                <td>31.70</td>
+                <td>99.53</td>
+                <td style="color:#27ae60;font-weight:bold">+213.97%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>002716.XSHE </td>
+                <td>6.92</td>
+                <td>19.04</td>
+                <td style="color:#27ae60;font-weight:bold">+175.14%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>688766.XSHG </td>
+                <td>127.21</td>
+                <td>306.00</td>
+                <td style="color:#27ae60;font-weight:bold">+140.55%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>001337.XSHE </td>
+                <td>27.86</td>
+                <td>66.18</td>
+                <td style="color:#27ae60;font-weight:bold">+137.54%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>601212.XSHG </td>
+                <td>5.85</td>
+                <td>13.67</td>
+                <td style="color:#27ae60;font-weight:bold">+133.68%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300164.XSHE </td>
+                <td>5.52</td>
+                <td>12.88</td>
+                <td style="color:#27ae60;font-weight:bold">+133.33%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>300139.XSHE </td>
+                <td>30.36</td>
+                <td>67.50</td>
+                <td style="color:#27ae60;font-weight:bold">+122.33%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>603052.XSHG </td>
+                <td>31.55</td>
+                <td>69.07</td>
+                <td style="color:#27ae60;font-weight:bold">+118.92%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>603061.XSHG </td>
+                <td>140.40</td>
+                <td>300.68</td>
+                <td style="color:#27ae60;font-weight:bold">+114.16%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-02 对比
+                <span style="color:#27ae60">我的月均: +2.72%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>001896.XSHE </td>
+                <td>6.20</td>
+                <td>13.34</td>
+                <td style="color:#27ae60;font-weight:bold">+115.16%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>600397.XSHG </td>
+                <td>10.02</td>
+                <td>21.53</td>
+                <td style="color:#27ae60;font-weight:bold">+114.87%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>301362.XSHE </td>
+                <td>44.98</td>
+                <td>95.99</td>
+                <td style="color:#27ae60;font-weight:bold">+113.41%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>603618.XSHG </td>
+                <td>9.04</td>
+                <td>18.15</td>
+                <td style="color:#27ae60;font-weight:bold">+100.77%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>300749.XSHE </td>
+                <td>16.74</td>
+                <td>32.23</td>
+                <td style="color:#27ae60;font-weight:bold">+92.53%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>688480.XSHG </td>
+                <td>77.19</td>
+                <td>148.00</td>
+                <td style="color:#27ae60;font-weight:bold">+91.73%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>688530.XSHG </td>
+                <td>21.86</td>
+                <td>41.66</td>
+                <td style="color:#27ae60;font-weight:bold">+90.58%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>002378.XSHE </td>
+                <td>22.79</td>
+                <td>40.60</td>
+                <td style="color:#27ae60;font-weight:bold">+78.15%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>300912.XSHE </td>
+                <td>19.85</td>
+                <td>34.82</td>
+                <td style="color:#27ae60;font-weight:bold">+75.42%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>000711.XSHE </td>
+                <td>2.12</td>
+                <td>3.64</td>
+                <td style="color:#27ae60;font-weight:bold">+71.70%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-03 对比
+                <span style="color:#e74c3c">我的月均: -6.65%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>600396.XSHG </td>
+                <td>3.36</td>
+                <td>8.35</td>
+                <td style="color:#27ae60;font-weight:bold">+148.51%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>600726.XSHG </td>
+                <td>2.72</td>
+                <td>6.41</td>
+                <td style="color:#27ae60;font-weight:bold">+135.66%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>000890.XSHE </td>
+                <td>7.66</td>
+                <td>15.43</td>
+                <td style="color:#27ae60;font-weight:bold">+101.44%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>603538.XSHG </td>
+                <td>22.38</td>
+                <td>40.90</td>
+                <td style="color:#27ae60;font-weight:bold">+82.75%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>300385.XSHE </td>
+                <td>12.00</td>
+                <td>20.62</td>
+                <td style="color:#27ae60;font-weight:bold">+71.83%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>688295.XSHG </td>
+                <td>32.13</td>
+                <td>55.05</td>
+                <td style="color:#27ae60;font-weight:bold">+71.34%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>605299.XSHG </td>
+                <td>12.75</td>
+                <td>21.33</td>
+                <td style="color:#27ae60;font-weight:bold">+67.29%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>603778.XSHG </td>
+                <td>14.98</td>
+                <td>25.00</td>
+                <td style="color:#27ae60;font-weight:bold">+66.89%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>002432.XSHE </td>
+                <td>44.39</td>
+                <td>73.58</td>
+                <td style="color:#27ae60;font-weight:bold">+65.76%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>002082.XSHE </td>
+                <td>18.77</td>
+                <td>30.20</td>
+                <td style="color:#27ae60;font-weight:bold">+60.90%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-04 对比
+                <span style="color:#e74c3c">我的月均: -4.75%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>688227.XSHG </td>
+                <td>60.95</td>
+                <td>143.55</td>
+                <td style="color:#27ae60;font-weight:bold">+135.52%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>688628.XSHG </td>
+                <td>42.34</td>
+                <td>97.00</td>
+                <td style="color:#27ae60;font-weight:bold">+129.10%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>603629.XSHG </td>
+                <td>64.24</td>
+                <td>144.41</td>
+                <td style="color:#27ae60;font-weight:bold">+124.80%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>002297.XSHE </td>
+                <td>10.93</td>
+                <td>24.50</td>
+                <td style="color:#27ae60;font-weight:bold">+124.15%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>688485.XSHG </td>
+                <td>24.70</td>
+                <td>55.20</td>
+                <td style="color:#27ae60;font-weight:bold">+123.48%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>300905.XSHE </td>
+                <td>31.30</td>
+                <td>68.12</td>
+                <td style="color:#27ae60;font-weight:bold">+117.64%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>603773.XSHG </td>
+                <td>32.76</td>
+                <td>69.35</td>
+                <td style="color:#27ae60;font-weight:bold">+111.69%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>301217.XSHE </td>
+                <td>37.50</td>
+                <td>78.34</td>
+                <td style="color:#27ae60;font-weight:bold">+108.91%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>688268.XSHG </td>
+                <td>91.00</td>
+                <td>188.30</td>
+                <td style="color:#27ae60;font-weight:bold">+106.92%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>301396.XSHE </td>
+                <td>153.29</td>
+                <td>316.74</td>
+                <td style="color:#27ae60;font-weight:bold">+106.63%</td>
+            </tr></tbody>
+            </table>
+        </div>
+        <div class="month-card">
+            <h3>2026-05 对比
+                <span style="color:#e74c3c">我的月均: -2.58%</span>
+                <span style="color:#3498db"> | 未命中TOP10</span>
+            </h3>
+            <table class="stock-table">
+                <thead><tr><th>排名</th><th>实际最强股票</th><th>月初价</th><th>月末价</th><th>实际涨幅</th></tr></thead>
+                <tbody>
+            <tr>
+                <td>#1</td>
+                <td>301666.XSHE </td>
+                <td>318.00</td>
+                <td>680.00</td>
+                <td style="color:#27ae60;font-weight:bold">+113.84%</td>
+            </tr>
+            <tr>
+                <td>#2</td>
+                <td>601991.XSHG </td>
+                <td>4.16</td>
+                <td>7.92</td>
+                <td style="color:#27ae60;font-weight:bold">+90.38%</td>
+            </tr>
+            <tr>
+                <td>#3</td>
+                <td>688146.XSHG </td>
+                <td>80.35</td>
+                <td>145.55</td>
+                <td style="color:#27ae60;font-weight:bold">+81.14%</td>
+            </tr>
+            <tr>
+                <td>#4</td>
+                <td>688478.XSHG </td>
+                <td>41.94</td>
+                <td>75.00</td>
+                <td style="color:#27ae60;font-weight:bold">+78.83%</td>
+            </tr>
+            <tr>
+                <td>#5</td>
+                <td>688820.XSHG </td>
+                <td>103.00</td>
+                <td>183.84</td>
+                <td style="color:#27ae60;font-weight:bold">+78.49%</td>
+            </tr>
+            <tr>
+                <td>#6</td>
+                <td>001259.XSHE </td>
+                <td>34.34</td>
+                <td>60.50</td>
+                <td style="color:#27ae60;font-weight:bold">+76.18%</td>
+            </tr>
+            <tr>
+                <td>#7</td>
+                <td>300959.XSHE </td>
+                <td>94.37</td>
+                <td>166.00</td>
+                <td style="color:#27ae60;font-weight:bold">+75.90%</td>
+            </tr>
+            <tr>
+                <td>#8</td>
+                <td>600396.XSHG </td>
+                <td>9.92</td>
+                <td>17.43</td>
+                <td style="color:#27ae60;font-weight:bold">+75.71%</td>
+            </tr>
+            <tr>
+                <td>#9</td>
+                <td>688143.XSHG </td>
+                <td>62.40</td>
+                <td>108.20</td>
+                <td style="color:#27ae60;font-weight:bold">+73.40%</td>
+            </tr>
+            <tr>
+                <td>#10</td>
+                <td>002918.XSHE </td>
+                <td>10.84</td>
+                <td>18.63</td>
+                <td style="color:#27ae60;font-weight:bold">+71.86%</td>
+            </tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>数据来源: rqalpha bundle (5065只股票) | 策略: MACD+RSI+布林带+均线+动量 加权评分</p>
+        <p>选股逻辑: 每月末用历史数据评分，下月初等权买入TOP10，月末结算 | 手续费: 0.15%</p>
+        <p>免责声明: 本回测仅供参考，不构成投资建议</p>
+    </div>
+</div>
+
+<script>
+// 组合市值走势图
+new Chart(document.getElementById('portfolioChart'), {
+    type: 'line',
+    data: {
+        labels: ["2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+        datasets: [{
+            label: '组合市值',
+            data: [100000, 94751.83, 96495.63, 105254.64, 111632.86, 116019.49, 110864.71, 110092.81, 108336.53, 99778.05, 100627.58, 103368.32, 96497.92, 91911.54, 89537.61],
+            borderColor: '#00d4ff',
+            backgroundColor: 'rgba(0,212,255,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+        }, {
+            label: '基准 (100,000)',
+            data: [100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000, 100000],
+            borderColor: '#555',
+            borderDash: [5, 5],
+            pointRadius: 0,
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#aaa' } } },
+        scales: {
+            x: { ticks: { color: '#888' }, grid: { color: '#1a2a3a' } },
+            y: { ticks: { color: '#888' }, grid: { color: '#1a2a3a' } }
+        }
+    }
+});
+
+// 月度收益柱状图
+new Chart(document.getElementById('returnsChart'), {
+    type: 'bar',
+    data: {
+        labels: ["2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+        datasets: [{
+            label: '月收益率(%)',
+            data: [-5.25, 1.84, 9.08, 6.06, 3.93, -4.44, -0.7, -1.6, -7.9, 0.85, 2.72, -6.65, -4.75, -2.58],
+            backgroundColor: ["#e74c3c", "#27ae60", "#27ae60", "#27ae60", "#27ae60", "#e74c3c", "#e74c3c", "#e74c3c", "#e74c3c", "#27ae60", "#27ae60", "#e74c3c", "#e74c3c", "#e74c3c"],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#aaa' } } },
+        scales: {
+            x: { ticks: { color: '#888' }, grid: { color: '#1a2a3a' } },
+            y: { ticks: { color: '#888' }, grid: { color: '#1a2a3a' } }
+        }
+    }
+});
+
+function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab button').forEach(el => el.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
